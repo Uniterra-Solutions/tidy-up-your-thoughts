@@ -13,6 +13,7 @@ edited by `skill_manage` or the curator.
 | `tidy-up-your-thoughts:visualize` | Reads `~/thoughts/<topic>/summary.md` and draws it: a mind map for composition, a decision flow for forks, an argument chain that puts the negation last, a quadrant for a trade-off, a timeline for how the thinking moved — two to four diagrams, every node traceable to a summary line, open questions dashed. Renders PNG + SVG, checks provenance mechanically, and folds user corrections back into `summary.md` and `REVISIONS.md` rather than patching the picture |
 | `tidy-up-your-thoughts:refine` | Stress-tests the idea against the world: four read-only subagents, one lens each (steelman / mechanism / premise audit / failure mode), return concrete situations rather than risks; the main agent verifies each quote against the summary, merges by decision point and keeps the convergence count, then asks one situation at a time and records the answers. Writes `refine.md` — settled verdicts with observable criteria, and the blanks left blank |
 | `tidy-up-your-thoughts:tidy` | Turns the whole topic folder into `report.md` for a reader who was not there: every statement traced to `[Qn]` / `[Sxx]`, ordered by support rather than chronology, domain terms verified against the instrument or standard that defines them. Topic sentence per paragraph, declarative sentences, and negation admitted only inside a rebuttal that first builds the counter-argument in full |
+| `tidy-up-your-thoughts:report` | Meta skill for when the workflow itself misfired: finds the guideline that produced the wrong action (quoted with file and line, or names the missing one), extracts one abstract anti-pattern with six fields, then applies exactly one class of fix — prompt, information, code or process — in the same session, and appends it to an anti-pattern index with a regression criterion. The same skill ships in `pdd` as `pdd:report`, writing to the repo's `docs/retro/` instead |
 
 ## Install
 
@@ -52,6 +53,13 @@ skills/visualize/
 └── scripts/
     └── render.py              render diagrams/*.mmd → png + svg; enforce the `%% source:` header
 
+skills/report/
+├── SKILL.md                   incident → guideline → anti-pattern → one class of fix
+├── assets/
+│   └── report-template.md     the skeleton, with what each section is for
+└── scripts/
+    └── check_friction.py      citation, six fields, one class, process argument, regression
+
 skills/tidy/
 ├── SKILL.md                   read everything → verify vocabulary → write report.md
 ├── references/
@@ -81,6 +89,7 @@ diagrams/     *.mmd sources, rendered *.png / *.svg, visual.md captions, REVISIO
 refine.md     the situations the idea met, what was settled, what was left blank
 refine-raw/   one verbatim return per lens — the merge is auditable only while these survive
 report.md     the deliverable for a reader who was not there (tidy)
+friction/     incident reports about the process itself (report)
 ```
 
 ## Adding a skill
