@@ -1,0 +1,8 @@
+name: tidy-up-your-thoughts
+version: 0.1.0
+description: Tidy Up Your Thoughts — bundled Hermes skills that take a pile of unstructured thinking and reduce it to named, ordered, testable concepts before anything is built or decided on it.
+author: Uniterra Solutions Ltd.
+license: MIT
+homepage: https://github.com/Uniterra-Solutions/tidy-up-your-thoughts
+provides_tools: []
+provides_hooks: []
