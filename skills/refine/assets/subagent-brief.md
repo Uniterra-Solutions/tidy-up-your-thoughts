@@ -21,12 +21,12 @@ Between three and six situations. A situation is a moment the user will have to 
 concretely that he can answer it without asking you anything.
 
 ```
-### S<n> · <一句話的標題，不動詞>
+### S01 · <一句話的標題，不動詞>
 - 鏡頭: <lens name>
 - 觸發: <什麼事件、由誰、在什麼時間點發生>
 - 觀察: <用戶會看到什麼，看得到才算>
-- 威脅哪一條: <quote the summary line, verbatim>
-- 需要你決定: <one question, no answer options>
+- 威脅哪一條: <the summary line, copied character for character, with no quotation marks of your own added>
+- 需要你決定: <one question that asks for a decision or a policy — not for a calculation, not for an estimate, and carrying no answer options>
 ```
 
 Rules for the situations:
@@ -36,9 +36,20 @@ Rules for the situations:
    actor, a date or a trigger, and something observable happening.
 3. **No re-asking what the record already settled.** If `summary.md` answers it, it is not a situation.
 4. **No options.** 「需要你決定」 is a question, never 「A 還是 B」.
-5. **Quote, do not paraphrase, the summary line under threat.** An unquoted threat cannot be checked.
+5. **Copy, do not paraphrase, the summary line under threat** — and add no quotation marks of your
+   own; the line may already contain them. A copied line can be checked against `summary.md`; a
+   paraphrase cannot.
 6. **Rank by when it arrives**, earliest first. A situation that is already true goes first.
 7. **The user's language.** Chinese in, Chinese out; keep identifiers and file names as they are.
+8. **Ids are two digits**: `S01`, `S02`, never `S1`. Number from 01, in the order you rank them.
+9. **The numbers inside a situation are yours, and they are hypothetical.** A discount you imagine,
+   a headcount you assume, an attendance figure you invent — all fine, because the situation is a
+   rehearsal. Writing them as if they were the market's is not: prefer a shape over a precise false
+   fact (「低四成」 over 「1,800」), and never cite a real company, price or filing you have not read.
+10. **Ask for a decision, not for arithmetic.** 「每小時成本跟 3,000 相差幾多？」 makes the user do
+    your sum. Either ask what he does once the number is known, or ask which of two costs he counts
+    first. The one exception: a decision that genuinely hangs on a figure only he holds, in which
+    case the question names the figure it turns on.
 
 ## What "your lens" changes
 

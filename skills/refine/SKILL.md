@@ -1,7 +1,7 @@
 ---
 name: refine
 description: "Use when an idea must meet its situations: lenses, then answers."
-version: 0.1.0
+version: 0.1.1
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -69,7 +69,10 @@ whose answer changes nothing.
      invented premise and is dropped;
    - it is not already answered in the summary;
    - it carries an actor and an observable event;
-   - it asks rather than advises.
+   - it asks rather than advises, and it asks for a decision rather than for a sum — a situation
+     whose question is 「成本相差幾多」 is a calculation the agent should have done, not a moment the
+     user must handle;
+   - it does not re-ask something the summary's 「詞的用法」 already defines.
 6. **Merge by decision point.** Several lenses land on the same moment; that is the strongest signal
    in the skill, so record one row and name every lens that found it. The count is the 共識 column and
    it is checked mechanically against the raw files.
@@ -129,6 +132,8 @@ Classify each answer while recording it:
 | S01 | 第一批客戶全是你認識的人 | 反面鋼人:S02, 前提審計:S05 | 2 | 「三個月內要找兩個不認識的買家」[Q15] | 已定 |
 | S02 | 對手降到六成 | 對手反應:S01 | 1 | — | 未答 |
 
+情境中的具體數字、人名與對手報價均為假設，不是紀錄中的事實。
+
 ## 這次 refine 改變了什麼
 
 - summary.md 第 3 條：原句以 ~~…~~ 標記，改為「…」[Q17]
@@ -178,6 +183,8 @@ Then the upstream effects, in this order:
   answers stop being specific; the rest go in the report as 未答.
 - **Silent merge.** A row whose 共識 count cannot be traced to raw files is a fabricated convergence.
   The checker exists for this.
+- **A calculation dressed as a question.** 「第三位導師的時薪除以時數之後，每小時成本相差幾多？」
+  hands the user arithmetic. The agent computes, then asks what he does about the answer.
 - **Refine as validation ritual.** If every situation is answered with 「已經想過」, the lenses were
   aimed at the summary instead of past it. Go back to `brainstorming` for a sharper one.
 
