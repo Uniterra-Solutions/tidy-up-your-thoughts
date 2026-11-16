@@ -10,6 +10,7 @@ edited by `skill_manage` or the curator.
 | Qualified name | What it does |
 | --- | --- |
 | `tidy-up-your-thoughts:brainstorming` | Socratic questioning that keeps every question at the abstract layer an outsider could answer, mirrors each answer back for correction, and writes the whole exchange to `~/thoughts/<topic_name>/` as a declarative record (`qa.md`, `summary.md`, `README.md`) — negation only after the steelman it refutes has been built in full |
+| `tidy-up-your-thoughts:visualize` | Reads `~/thoughts/<topic>/summary.md` and draws it: a mind map for composition, a decision flow for forks, an argument chain that puts the negation last, a quadrant for a trade-off, a timeline for how the thinking moved — two to four diagrams, every node traceable to a summary line, open questions dashed. Renders PNG + SVG, checks provenance mechanically, and folds user corrections back into `summary.md` and `REVISIONS.md` rather than patching the picture |
 
 ## Install
 
@@ -41,6 +42,22 @@ skills/brainstorming/
 └── references/
     ├── question-patterns.md   fourteen Socratic moves, with failure modes
     └── writing-rules.md       declarative voice, the negation protocol, the closing lint
+
+skills/visualize/
+├── SKILL.md                   draw the summary, then fold corrections back into it
+├── references/
+│   └── mermaid-templates.md   eight rendered types, one sample topic, the syntax that bites
+└── scripts/
+    └── render.py              render diagrams/*.mmd → png + svg; enforce the `%% source:` header
+```
+
+A topic lives in `~/thoughts/<topic_name>/`:
+
+```
+README.md     the topic in one line, opened date, open threads
+qa.md         append-only transcript (brainstorming)
+summary.md    what the topic establishes, each line with [Qn] provenance
+diagrams/     *.mmd sources, rendered *.png / *.svg, visual.md captions, REVISIONS.md
 ```
 
 ## Adding a skill
