@@ -1,7 +1,7 @@
 ---
 name: report
 description: "Use when the process misfired: turn the incident into an anti-pattern."
-version: 0.1.0
+version: 0.2.0
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -182,3 +182,10 @@ write to `~/thoughts/_incidents/` and say so in the report.
 - [ ] The regression criterion names something observable.
 - [ ] The anti-pattern is appended to the host's index with a fresh id.
 - [ ] `scripts/check_friction.py <report path>` exits 0.
+
+## References
+
+- `references/gate-discipline.md` — five rules for the checkers these skills run, extracted from AP-001 to
+  AP-005. Read it before trusting a green run, and before filing an incident as "a script said it passed".
+- `assets/report-template.md` — the skeleton, with what each section is for.
+- `scripts/check_friction.py` — the mechanical shadow of this skill's rules.

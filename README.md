@@ -144,6 +144,7 @@ skills/tidy/
 
 skills/report/
 ├── SKILL.md                   incident → guideline → anti-pattern → one class of fix
+├── references/gate-discipline.md   five rules for trusting a checker's green run
 ├── assets/report-template.md  the skeleton, with what each section is for
 └── scripts/check_friction.py  citation, six fields, one class, process argument, regression
 ```
