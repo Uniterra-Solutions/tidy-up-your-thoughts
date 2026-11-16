@@ -48,11 +48,11 @@ work with a different failure. One conversation does all of them badly.
 
 ```mermaid
 flowchart TB
-  idea(["模糊的想法"]) --> q["brainstorming<br/>提問 → qa.md / summary.md"]
-  q --> v["visualize<br/>summary → 圖"]
-  v --> r["refine<br/>情境 → 答覆 → refine.md"]
-  r --> t["tidy<br/>前置文件 → report.md"]
-  r -.->|"答覆改變了想法"| q
+  idea(["a vague idea"]) --> q["brainstorming<br/>questions → qa.md / summary.md"]
+  q --> v["visualize<br/>summary → diagrams"]
+  v --> r["refine<br/>situations → answers → refine.md"]
+  r --> t["tidy<br/>every earlier file → report.md"]
+  r -.->|"an answer moved the idea"| q
 ```
 
 `report` is not a stage in that chain: it repairs any stage that misfired, and it is described below.
