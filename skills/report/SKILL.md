@@ -1,7 +1,7 @@
 ---
 name: report
 description: "Use when the process misfired: turn the incident into an anti-pattern."
-version: 0.2.0
+version: 0.3.0
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -154,6 +154,84 @@ exactly as the study ids are not.
 When a topic has no `~/thoughts/` directory because the incident happened outside a topic session,
 write to `~/thoughts/_incidents/` and say so in the report.
 
+## Step 5 — publish it as an issue
+
+Publication is where an internal document becomes a public one. Two rules, in this order: **search before
+writing**, **scrub before posting**.
+
+### 5a. Search first; a matching issue gets a comment, not a twin
+
+Dedupe on the anti-pattern, not on the incident. Two incidents with different artefacts but the same
+mechanism are one issue, whatever each was called at the time.
+
+```bash
+gh issue list --repo <owner/repo> --state all --limit 100 \
+  --search "in:title,body <the mechanism, in three or four words>"
+gh issue list --repo <owner/repo> --state all --label anti-pattern --limit 50
+```
+
+Read the candidate bodies, not only the titles: an issue is titled by whoever opened it, and the same
+mechanism arrives under different names.
+
+| What the search finds | What you do |
+| --- | --- |
+| A mechanism match | `gh issue comment <n> --body-file <draft>` — the new AP id, the date, and what the new instance adds: a second occurrence, a new symptom, a regression criterion that failed |
+| A mechanism match, already **closed** | Comment anyway. A recurrence is the strongest evidence the project can get, and the comment names the regression criterion that did not hold |
+| Nothing that matches | `gh issue create --repo <owner/repo> --title "[AP-00n] <anti-pattern title>" --body-file <draft>` |
+
+Never open a second issue for a mechanism that already has one, whatever the new instance is called. Never
+retitle someone else's issue to fit a new instance. Never reopen a closed issue: the comment carries the
+recurrence, and the maintainer decides what the state should become.
+
+Record the outcome in the report's 落地 section and in the index row — `#<n>` for a comment,
+`<owner/repo>#<n>` for a new issue. An issue number that lives only in the session is one nobody will find
+from the report.
+
+### 5b. Scrub it: the report keeps the instance, the issue keeps the class
+
+The report on disk is internal: it may name the repository, the branch, the file, the person, the price.
+The issue is public — read by strangers, indexed by search engines, mirrored by tooling that watches the
+tracker. Publication therefore requires removing everything that says who or where.
+
+Remove before the draft leaves the machine:
+
+- **People** — names, handles, initials, and job titles narrow enough to identify one person.
+- **Organisations** — employer, client, vendor, funder, counterparty.
+- **Projects** — repository names other than the plugin's own, product names, internal service names,
+  ticket prefixes, branch names, commit shas.
+- **Paths and hosts** — any absolute path (`/Users/<name>/…`, `/root/…`, `~/<client>/…`), internal
+  hostnames, IP and tailnet addresses, internal service ports.
+- **Contact and identifiers** — emails, phone numbers, account and contract ids, invoice numbers.
+- **Commercial detail** — prices, volumes, margins, and dates that pin an engagement to a fortnight.
+- **Quotes long enough to attribute** — a quoted sentence that survives a search engine identifies who
+  said it.
+
+Keep, because this is what the issue is for:
+
+- the **mechanism** and its **trigger**, in generic terms — 「a checker that both scopes the scan and
+  resolves relative citations with one flag」;
+- the **artefact class** — 「a per-directory agent-context file」, not a path inside a private repo;
+- the **symptom as observed**, not as narrated — 「nine files reported `does not exist` while the files
+  were present」;
+- the **class of fix** and the **regression criterion**, which are already written abstractly.
+
+Substitute rather than delete: 「the host repo」, 「a subagent」, 「a checker script」, 「a private
+repository」. A scrubbed issue remains a complete lesson. If a sentence no longer makes sense without the
+removed name, the sentence was about the instance — delete it rather than weaken the scrub.
+
+Then let the check be the gate:
+
+```
+python3 scripts/check_issue.py <draft.md> --deny "<client>,<repo>,<person>"
+```
+
+It fails on absolute home paths, emails, IPv4 literals, non-GitHub URLs, bare commit shas, and any word
+passed to `--deny`; it requires the body to carry a redaction line (`脫敏：…` or `Redaction: …`) so the
+published text states what was removed. Passing is not the same as being un-re-identifiable — that is a
+reading, and the reading is the last thing before `gh`.
+
+The comment path is public too: the same rules apply to a comment body.
+
 ## Pitfalls
 
 - **The apology.** 「這次我沒有先確認」 explains nothing and prevents nothing. The subject of the
@@ -168,6 +246,18 @@ write to `~/thoughts/_incidents/` and say so in the report.
   different fixes. Guessing which one it was guarantees the fix lands in the wrong class.
 - **The fix left as a task.** 「下一步：更新 SKILL.md」 is the report failing at its own job. Edit the
   file in this session.
+- **The issue that is a paste of the report.** The report is internal and may name the repository, the
+  branch and the person; the issue is public. A body carrying a path, a handle or a price has not been
+  published, it has leaked.
+- **The duplicate opened because the search used the incident's words.** Searching for the file, the
+  product or the client finds nothing; searching for the mechanism in three words finds the issue that has
+  been open for months. Search the pattern, not the story.
+- **The recurrence filed as a new issue.** A second occurrence of an existing mechanism is evidence, and
+  evidence belongs in the thread it supports. A new issue splits the history and resets the count to one.
+- **The scrub that kept the quote.** A quoted sentence long enough to search for is an identifier. Keep the
+  claim, drop the sentence, or paraphrase it into the mechanism.
+- **Posting before checking.** `gh` is the step after the scrub and the search, never the step that
+  discovers there was already an issue.
 - **The index that never grows.** An anti-pattern written into an index nobody reads has the same
   effect as none. Add a line to the index and point the next session at it.
 
@@ -182,6 +272,12 @@ write to `~/thoughts/_incidents/` and say so in the report.
 - [ ] The regression criterion names something observable.
 - [ ] The anti-pattern is appended to the host's index with a fresh id.
 - [ ] `scripts/check_friction.py <report path>` exits 0.
+- [ ] The tracker was searched for the mechanism before writing; a match received a comment on the
+      existing issue, and the report names `#<n>` or `<owner/repo>#<n>`.
+- [ ] The draft passed `scripts/check_issue.py <draft> --deny "<identifying words>"`, and carries its
+      redaction line.
+- [ ] No person, organisation, project, path, host, identifier or price from the instance appears in the
+      public text.
 
 ## References
 

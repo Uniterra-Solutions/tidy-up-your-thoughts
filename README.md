@@ -146,7 +146,9 @@ skills/report/
 ├── SKILL.md                   incident → guideline → anti-pattern → one class of fix
 ├── references/gate-discipline.md   five rules for trusting a checker's green run
 ├── assets/report-template.md  the skeleton, with what each section is for
-└── scripts/check_friction.py  citation, six fields, one class, process argument, regression
+└── scripts/
+    ├── check_friction.py      citation, six fields, one class, process argument, regression
+    └── check_issue.py         publish gate: paths, contacts, revisions, deny words, redaction line
 ```
 
 Each script is a mechanical shadow of its skill's rules — the checks a reader would otherwise have to
