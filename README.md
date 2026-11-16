@@ -11,6 +11,7 @@ edited by `skill_manage` or the curator.
 | --- | --- |
 | `tidy-up-your-thoughts:brainstorming` | Socratic questioning that keeps every question at the abstract layer an outsider could answer, mirrors each answer back for correction, and writes the whole exchange to `~/thoughts/<topic_name>/` as a declarative record (`qa.md`, `summary.md`, `README.md`) — negation only after the steelman it refutes has been built in full |
 | `tidy-up-your-thoughts:visualize` | Reads `~/thoughts/<topic>/summary.md` and draws it: a mind map for composition, a decision flow for forks, an argument chain that puts the negation last, a quadrant for a trade-off, a timeline for how the thinking moved — two to four diagrams, every node traceable to a summary line, open questions dashed. Renders PNG + SVG, checks provenance mechanically, and folds user corrections back into `summary.md` and `REVISIONS.md` rather than patching the picture |
+| `tidy-up-your-thoughts:refine` | Stress-tests the idea against the world: four read-only subagents, one lens each (steelman / mechanism / premise audit / failure mode), return concrete situations rather than risks; the main agent verifies each quote against the summary, merges by decision point and keeps the convergence count, then asks one situation at a time and records the answers. Writes `refine.md` — settled verdicts with observable criteria, and the blanks left blank |
 
 ## Install
 
@@ -49,6 +50,15 @@ skills/visualize/
 │   └── mermaid-templates.md   eight rendered types, one sample topic, the syntax that bites
 └── scripts/
     └── render.py              render diagrams/*.mmd → png + svg; enforce the `%% source:` header
+
+skills/refine/
+├── SKILL.md                   dispatch lenses → ask one situation at a time → write refine.md
+├── references/
+│   └── lenses.md              eight lenses, how to pick four, how convergence is used
+├── assets/
+│   └── subagent-brief.md      the brief, dispatched verbatim, with the failures it prevents
+└── scripts/
+    └── check_refine.py        verdicts, [Qn] refs, consensus counts, qa numbering, raw returns
 ```
 
 A topic lives in `~/thoughts/<topic_name>/`:
@@ -58,6 +68,8 @@ README.md     the topic in one line, opened date, open threads
 qa.md         append-only transcript (brainstorming)
 summary.md    what the topic establishes, each line with [Qn] provenance
 diagrams/     *.mmd sources, rendered *.png / *.svg, visual.md captions, REVISIONS.md
+refine.md     the situations the idea met, what was settled, what was left blank
+refine-raw/   one verbatim return per lens — the merge is auditable only while these survive
 ```
 
 ## Adding a skill
