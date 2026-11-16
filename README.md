@@ -47,17 +47,15 @@ work with a different failure. One conversation does all of them badly.
 | Fix the process | `report` | an incident turned into one anti-pattern and one class of change | an apology |
 
 ```mermaid
-flowchart LR
-  idea(["模糊的想法"])
-  q["brainstorming<br/>提問 → qa.md / summary.md"]
-  v["visualize<br/>summary → 圖"]
-  r["refine<br/>情境 → 答覆 → refine.md"]
-  t["tidy<br/>全部前置文件 → report.md"]
-  e["report<br/>流程出錯 → 反模式 + 一類改進"]
-  idea --> q --> v --> r --> t
+flowchart TB
+  idea(["模糊的想法"]) --> q["brainstorming<br/>提問 → qa.md / summary.md"]
+  q --> v["visualize<br/>summary → 圖"]
+  v --> r["refine<br/>情境 → 答覆 → refine.md"]
+  r --> t["tidy<br/>前置文件 → report.md"]
   r -.->|"答覆改變了想法"| q
-  t -.->|"流程本身出錯"| e
 ```
+
+`report` is not a stage in that chain: it repairs any stage that misfired, and it is described below.
 
 Three invariants hold across every stage, and they are what make the output trustworthy:
 
