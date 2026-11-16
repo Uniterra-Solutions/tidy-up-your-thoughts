@@ -1,12 +1,15 @@
 # tidy-up-your-thoughts
 
 A Hermes plugin that ships its skills as **bundled** skills — same packaging as
-[`pdd-software-development`](https://github.com/Uniterra-Solutions/pdd-software-development).
+[`pdd-software-development`](https://github.com/Uniterra-Solutions/pdd-software-development):
+the skills live in the plugin registry, never in `~/.hermes/skills/`, and cannot be
+edited by `skill_manage` or the curator.
 
-The skill set is deliberately empty right now. The skeleton, the registration
-contract and the install path are in place and verified; skills are added one at a
-time under `skills/<name>/SKILL.md` and become loadable immediately as
-`skill_view("tidy-up-your-thoughts:<name>")`.
+## Skills
+
+| Qualified name | What it does |
+| --- | --- |
+| `tidy-up-your-thoughts:brainstorming` | Socratic questioning that keeps every question at the abstract layer an outsider could answer, mirrors each answer back for correction, and writes the whole exchange to `~/thoughts/<topic_name>/` as a declarative record (`qa.md`, `summary.md`, `README.md`) — negation only after the steelman it refutes has been built in full |
 
 ## Install
 
@@ -14,13 +17,15 @@ time under `skills/<name>/SKILL.md` and become loadable immediately as
 hermes plugins install Uniterra-Solutions/tidy-up-your-thoughts --enable
 ```
 
-Or from this local checkout:
+While developing from this checkout, link it in instead — `hermes plugins install`
+takes a catalog name, a git URL or `owner/repo`, and refuses a bare local path:
 
 ```bash
-hermes plugins install ~/tidy-up-your-thoughts --enable
+ln -sfn ~/tidy-up-your-thoughts "$HERMES_HOME/plugins/tidy-up-your-thoughts"
+hermes plugins enable tidy-up-your-thoughts
 ```
 
-Disabling the plugin removes its skills from the index and deletes nothing:
+Disabling removes the skills from the index and deletes nothing:
 
 ```bash
 hermes plugins disable tidy-up-your-thoughts
@@ -29,9 +34,13 @@ hermes plugins disable tidy-up-your-thoughts
 ## Layout
 
 ```
-plugin.yaml        manifest: name, version, description, licence
-__init__.py        register(ctx) — one register_skill() call per skills/<dir>/SKILL.md
-skills/            one directory per skill; empty for now
+plugin.yaml                    manifest: name, version, description, licence
+__init__.py                    register(ctx) — one register_skill() per skills/<dir>/SKILL.md
+skills/brainstorming/
+├── SKILL.md                   the workflow and the three laws
+└── references/
+    ├── question-patterns.md   fourteen Socratic moves, with failure modes
+    └── writing-rules.md       declarative voice, the negation protocol, the closing lint
 ```
 
 ## Adding a skill
@@ -75,25 +84,25 @@ skills/            one directory per skill; empty for now
 ## Verifying a change
 
 ```bash
-# 1. the module imports and register() enumerates the skills it should
-python3 - <<'PY'
-import sys, logging; from pathlib import Path
-sys.path.insert(0, str(Path.home()/".hermes/hermes-agent"))
-from plugins.plugin_loader import load_plugin_module
-m = load_plugin_module("hermes_plugins.tidy_up_your_thoughts",
-                       Path.home()/"tidy-up-your-thoughts",
-                       parents=("hermes_plugins",), logger=logging.getLogger("x"))
-class Ctx:
-    def register_skill(self, n, p, description=""): print(n, "|", description)
-m.register(Ctx())
-PY
+# 1. manifest, register() run in isolation, security scan — the cheap gate
+hermes plugins validate .
 
-# 2. the CLI sees the installed plugin and its manifest
-hermes plugins list | grep tidy
+# 2. what the live plugin manager actually registered (use the interpreter that
+#    carries Hermes's own dependency closure; a plain python3 dies on ruamel)
+VP=$(ls -d ~/.hermes/installs/*/environments/*/venv/bin/python3 | head -1)
+env -u PYTHONPATH "$VP" - <<'PY'
+import sys; from pathlib import Path
+sys.path.insert(0, str(Path.home()/".hermes/hermes-agent"))
+from hermes_cli.plugins import get_plugin_manager
+pm = get_plugin_manager(); pm.discover_and_load()
+print(sorted(pm._plugins))
+for name, meta in sorted(pm._plugin_skills.items()):
+    print(name, "|", meta.get("description", "")[:70])
+PY
 ```
 
 Then, in a **new** session (registered skills are snapshotted at startup), confirm
-`skills_list` shows `tidy-up-your-thoughts:<name>`.
+`skills_list` shows `tidy-up-your-thoughts:brainstorming`.
 
 ## Licence
 

@@ -1,6 +1,6 @@
 name: tidy-up-your-thoughts
-version: 0.1.0
-description: Tidy Up Your Thoughts — bundled Hermes skills that take a pile of unstructured thinking and reduce it to named, ordered, testable concepts before anything is built or decided on it.
+version: 0.2.0
+description: Tidy Up Your Thoughts — bundled Hermes skills that take a pile of unstructured thinking and reduce it to named, ordered, testable concepts before anything is built or decided on it. Ships brainstorming as tidy-up-your-thoughts:brainstorming — Socratic questioning that holds every question at the abstract layer and writes the whole exchange to ~/thoughts/<topic>/ as declarative record.
 author: Uniterra Solutions Ltd.
 license: MIT
 homepage: https://github.com/Uniterra-Solutions/tidy-up-your-thoughts
