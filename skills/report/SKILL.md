@@ -1,7 +1,7 @@
 ---
 name: report
 description: "Use when the process misfired: turn the incident into an anti-pattern."
-version: 0.3.0
+version: 0.3.1
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -142,14 +142,18 @@ from memory.
 The skill is installed in two plugins and the destination differs by host. Resolve it from your own
 `skill_dir`:
 
-| Loaded from | Report | Anti-pattern index |
-| --- | --- | --- |
-| `tidy-up-your-thoughts:report` | `~/thoughts/<topic_name>/friction/YYYY-MM-DD-<slug>.md` | `~/thoughts/_anti-patterns.md` |
-| `pdd:report` | `<repo>/docs/retro/YYYY-MM-DD-<slug>.md` | `<repo>/docs/retro/ANTI-PATTERNS.md` |
+| Loaded from | Report | Anti-pattern index | Issue repo |
+| --- | --- | --- | --- |
+| `tidy-up-your-thoughts:report` | `~/thoughts/<topic_name>/friction/YYYY-MM-DD-<slug>.md` | `~/thoughts/_anti-patterns.md` | `Uniterra-Solutions/tidy-up-your-thoughts` |
+| `pdd:report` | `<repo>/docs/retro/YYYY-MM-DD-<slug>.md` | `<repo>/docs/retro/ANTI-PATTERNS.md` | `Uniterra-Solutions/pdd-software-development` |
 
 Both are append-only. The index carries one line per anti-pattern — id, title, date, the class of fix
 chosen — so a later session can see whether it is recurring. `AP` ids are never reused or renumbered,
 exactly as the study ids are not.
+
+**The issue repo is the repo of the plugin that loaded this skill** — it is public, it is ours, and it is
+the one place a later session looks. The product repository an incident happened in is never the
+destination: that repository is the artefact, not the home of the process that produced it.
 
 When a topic has no `~/thoughts/` directory because the incident happened outside a topic session,
 write to `~/thoughts/_incidents/` and say so in the report.
@@ -164,10 +168,19 @@ writing**, **scrub before posting**.
 Dedupe on the anti-pattern, not on the incident. Two incidents with different artefacts but the same
 mechanism are one issue, whatever each was called at the time.
 
+`--repo` is always the **issue repo from the table in §4** — the plugin you were loaded from. Both values
+are written here so that the destination never has to be inferred from the incident:
+
+```
+Uniterra-Solutions/pdd-software-development          # pdd:report
+Uniterra-Solutions/tidy-up-your-thoughts             # tidy-up-your-thoughts:report
+```
+
 ```bash
-gh issue list --repo <owner/repo> --state all --limit 100 \
+REPO=Uniterra-Solutions/<your row of §4>
+gh issue list --repo "$REPO" --state all --limit 100 \
   --search "in:title,body <the mechanism, in three or four words>"
-gh issue list --repo <owner/repo> --state all --label anti-pattern --limit 50
+gh issue list --repo "$REPO" --state all --label anti-pattern --limit 50
 ```
 
 Read the candidate bodies, not only the titles: an issue is titled by whoever opened it, and the same
@@ -177,27 +190,34 @@ mechanism arrives under different names.
 | --- | --- |
 | A mechanism match | `gh issue comment <n> --body-file <draft>` — the new AP id, the date, and what the new instance adds: a second occurrence, a new symptom, a regression criterion that failed |
 | A mechanism match, already **closed** | Comment anyway. A recurrence is the strongest evidence the project can get, and the comment names the regression criterion that did not hold |
-| Nothing that matches | `gh issue create --repo <owner/repo> --title "[AP-00n] <anti-pattern title>" --body-file <draft>` |
+| Nothing that matches | `gh issue create --repo "$REPO" --title "[AP-00n] <anti-pattern title>" --body-file <draft>` |
 
 Never open a second issue for a mechanism that already has one, whatever the new instance is called. Never
 retitle someone else's issue to fit a new instance. Never reopen a closed issue: the comment carries the
 recurrence, and the maintainer decides what the state should become.
 
+Never open an `[AP-…]` issue in the product repository the incident concerned. That list is the product's
+own defects; an anti-pattern filed there is invisible to the next session that needs it, and every later
+search for the mechanism starts in the wrong tracker.
+
 Record the outcome in the report's 落地 section and in the index row — `#<n>` for a comment,
-`<owner/repo>#<n>` for a new issue. An issue number that lives only in the session is one nobody will find
+`<issue repo>#<n>` for a new issue. An issue number that lives only in the session is one nobody will find
 from the report.
 
 ### 5b. Scrub it: the report keeps the instance, the issue keeps the class
 
 The report on disk is internal: it may name the repository, the branch, the file, the person, the price.
 The issue is public — read by strangers, indexed by search engines, mirrored by tooling that watches the
-tracker. Publication therefore requires removing everything that says who or where.
+tracker. Publication therefore requires removing everything that identifies the instance: the people, the
+organisations, the product, the paths. **The tracker's own repository is not an instance detail** — it is
+the destination named in §5a, and naming it is what makes the issue findable.
 
 Remove before the draft leaves the machine:
 
 - **People** — names, handles, initials, and job titles narrow enough to identify one person.
 - **Organisations** — employer, client, vendor, funder, counterparty.
-- **Projects** — repository names other than the plugin's own, product names, internal service names,
+- **Projects** — repository names other than the plugin's own (the destination repo is not a leak; the
+  product repo the incident happened in is), product names, internal service names,
   ticket prefixes, branch names, commit shas.
 - **Paths and hosts** — any absolute path (`/Users/<name>/…`, `/root/…`, `~/<client>/…`), internal
   hostnames, IP and tailnet addresses, internal service ports.
@@ -273,7 +293,9 @@ The comment path is public too: the same rules apply to a comment body.
 - [ ] The anti-pattern is appended to the host's index with a fresh id.
 - [ ] `scripts/check_friction.py <report path>` exits 0.
 - [ ] The tracker was searched for the mechanism before writing; a match received a comment on the
-      existing issue, and the report names `#<n>` or `<owner/repo>#<n>`.
+      existing issue, and the report names `#<n>` or `<issue repo>#<n>`.
+- [ ] The issue sits in the §4 issue repo of the plugin that loaded this skill — never in the product
+      repository the incident happened in.
 - [ ] The draft passed `scripts/check_issue.py <draft> --deny "<identifying words>"`, and carries its
       redaction line.
 - [ ] No person, organisation, project, path, host, identifier or price from the instance appears in the

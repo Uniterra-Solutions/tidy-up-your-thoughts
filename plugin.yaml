@@ -1,5 +1,5 @@
 name: tidy-up-your-thoughts
-version: 0.6.2
+version: 0.6.3
 description: "Tidy Up Your Thoughts — four bundled skills that take an unstructured pile to a written conclusion. tidy-up-your-thoughts:brainstorming asks Socratic questions at the abstract layer and records every exchange to ~/thoughts/<topic_name>/; tidy-up-your-thoughts:refine dispatches read-only subagents, one lens each (steelman, mechanism, premise audit, failure mode), verifies each return against the summary, merges by decision point, then asks the user one situation at a time and records his answers; tidy-up-your-thoughts:visualize draws the summary as rendered mermaid diagrams, with a correction loop that amends the summary rather than the picture; tidy-up-your-thoughts:tidy writes report.md — topic sentence first, declarative throughout, negation only inside a rebuttal that builds the counter-argument in full, and domain terms verified against the instrument that defines them. tidy-up-your-thoughts:report is the meta skill, used when the process itself misfired — it traces the incident to the guideline that produced it, extracts one abstract anti-pattern, and applies exactly one class of fix (prompt, information, code, or process) in the same session."
 author: Uniterra Solutions Ltd.
 license: MIT
