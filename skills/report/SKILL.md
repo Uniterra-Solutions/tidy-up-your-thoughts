@@ -1,7 +1,7 @@
 ---
 name: report
 description: "Use when the process misfired: turn the incident into an anti-pattern."
-version: 0.4.0
+version: 0.4.1
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
