@@ -1,7 +1,7 @@
 ---
 name: tidy
 description: "Use when the record must become a report: read all, verify terms, write."
-version: 0.1.0
+version: 0.2.0
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -132,8 +132,8 @@ Outside such a block, a negative thought is rewritten as an affirmative one:
 | 沒有證據顯示需求存在。 | 紀錄中關於需求的條目為零；與需求相關的陳述全部來自推測。 |
 
 Mark the block so a reader and the lint can both find it: a heading containing 反駁, or
-`<!-- rebuttal:start -->` … `<!-- rebuttal:end -->`. `scripts/check_report.py` fails every negative
-sentence that sits outside one.
+`<!-- rebuttal:start -->` … `<!-- rebuttal:end -->`. A negative sentence outside one is a finding, not a
+style note: the block is the only place a negation has an object a reader can meet.
 
 ## The report never does these
 
@@ -163,10 +163,9 @@ sentence that sits outside one.
 
 ## Verification
 
-- [ ] `scripts/check_report.py <topic>` exits 0: no negative sentence outside a rebuttal, no advice
-      wording, every citation resolves, a 詞的定義 section exists.
-- [ ] `scripts/check_report.py <topic> --outline` read top to bottom: the first sentences form an
-      outline on their own.
+- [ ] No negative sentence sits outside a rebuttal block, no advice wording appears, every citation
+      resolves, and a 詞的定義 section exists.
+- [ ] Read top to bottom, the first sentence of every paragraph forms an outline on its own.
 - [ ] Every substantive sentence traces to an inventory row.
 - [ ] Every domain term is defined where it first appears and sourced in 詞的定義.
 - [ ] Every unanswered situation in `refine.md` is still unanswered here, with its id.

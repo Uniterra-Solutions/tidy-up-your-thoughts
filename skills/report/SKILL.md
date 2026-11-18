@@ -1,7 +1,7 @@
 ---
 name: report
 description: "Use when the process misfired: turn the incident into an anti-pattern."
-version: 0.3.1
+version: 0.4.0
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -239,16 +239,17 @@ Substitute rather than delete: 「the host repo」, 「a subagent」, 「a check
 repository」. A scrubbed issue remains a complete lesson. If a sentence no longer makes sense without the
 removed name, the sentence was about the instance — delete it rather than weaken the scrub.
 
-Then let the check be the gate:
+Then read the draft against the scrub list, with a pattern where one exists:
 
 ```
-python3 scripts/check_issue.py <draft.md> --deny "<client>,<repo>,<person>"
+grep -nE '/(Users|home)/|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.|\b([0-9]{1,3}\.){3}[0-9]{1,3}\b|\b[0-9a-f]{7,40}\b|https?://' <draft.md>
+grep -niE '<client>|<repo>|<person>' <draft.md>
 ```
 
-It fails on absolute home paths, emails, IPv4 literals, non-GitHub URLs, bare commit shas, and any word
-passed to `--deny`; it requires the body to carry a redaction line (`脫敏：…` or `Redaction: …`) so the
-published text states what was removed. Passing is not the same as being un-re-identifiable — that is a
-reading, and the reading is the last thing before `gh`.
+What must be absent: absolute home paths, emails, IPv4 literals, non-GitHub URLs, bare commit shas, and every
+identifying word of the instance. What must be present: a redaction line (`脫敏：…` or `Redaction: …`)
+stating what was removed. A clean scan is not the same as being un-re-identifiable — that is a reading, and
+the reading is the last thing before `gh`.
 
 The comment path is public too: the same rules apply to a comment body.
 
@@ -291,12 +292,12 @@ The comment path is public too: the same rules apply to a comment body.
 - [ ] The improvement is already in the files, with the skill version bumped.
 - [ ] The regression criterion names something observable.
 - [ ] The anti-pattern is appended to the host's index with a fresh id.
-- [ ] `scripts/check_friction.py <report path>` exits 0.
+- [ ] every rule in this section was re-read against the finished report, not carried from an earlier draft.
 - [ ] The tracker was searched for the mechanism before writing; a match received a comment on the
       existing issue, and the report names `#<n>` or `<issue repo>#<n>`.
 - [ ] The issue sits in the §4 issue repo of the plugin that loaded this skill — never in the product
       repository the incident happened in.
-- [ ] The draft passed `scripts/check_issue.py <draft> --deny "<identifying words>"`, and carries its
+- [ ] The scrub scan and the identifying-word search both came back clean, and the draft carries its
       redaction line.
 - [ ] No person, organisation, project, path, host, identifier or price from the instance appears in the
       public text.
@@ -306,4 +307,3 @@ The comment path is public too: the same rules apply to a comment body.
 - `references/gate-discipline.md` — five rules for the checkers these skills run, extracted from AP-001 to
   AP-005. Read it before trusting a green run, and before filing an incident as "a script said it passed".
 - `assets/report-template.md` — the skeleton, with what each section is for.
-- `scripts/check_friction.py` — the mechanical shadow of this skill's rules.

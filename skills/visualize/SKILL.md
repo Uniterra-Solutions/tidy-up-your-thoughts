@@ -1,7 +1,7 @@
 ---
 name: visualize
 description: "Use when a thought summary must become diagrams the user can see."
-version: 0.1.0
+version: 0.2.0
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -102,13 +102,17 @@ Four rules that keep the picture honest:
 
 ### 1.4 Render, look, then deliver
 
-```
-python3 scripts/render.py ~/thoughts/<topic_name>
+```bash
+for f in ~/thoughts/<topic_name>/diagrams/*.mmd; do
+  npx -y @mermaid-js/mermaid-cli -i "$f" -o "${f%.mmd}.png" -b white -w 1600
+  npx -y @mermaid-js/mermaid-cli -i "$f" -o "${f%.mmd}.svg" -b white
+done
 ```
 
-It renders every `diagrams/*.mmd` to `.png` (2× scale, white background) beside a `.svg`, fails a
-file whose `%% source:` header is missing, and reports "no output written" as a failure rather than
-trusting the exit code. `--check` runs the rules without rendering.
+Every `.mmd` gets a `.png` (white background, double width) beside a `.svg`. A file whose `%% source:`
+header is missing is skipped and reported; a loop that wrote no output is a failure, never a pass with a
+quiet exit code. Three rules are read rather than run: every block starts with `%% source:`, no node id is
+declared twice with different labels, and no label is wider than its node can show.
 
 A render proves syntax, not intent. **Look at each PNG** before it leaves: cut-off labels, a node
 overlapping an edge, a mind map whose fan is unreadable at 10 characters per node. Fix the source and
@@ -186,7 +190,7 @@ and both are named in the caption.
 
 ### 2.4 Re-verify after every correction
 
-- `scripts/render.py <topic>` exits 0, and the changed PNG is newer than the changed `.mmd`.
+- Every `.mmd` was re-rendered, and the changed PNG is newer than the changed `.mmd`.
 - The PNG is looked at again — a label shortened to fix an overlap can lose the word that made it mean
   anything.
 - Nothing in any diagram now contradicts `summary.md`; when the summary moved, grep the labels for the
@@ -211,7 +215,7 @@ and both are named in the caption.
 ## Verification
 
 - [ ] Each `.mmd` starts with `%% source:` naming the summary lines it uses.
-- [ ] `scripts/render.py <topic>` reports 0 render failures and 0 rule warnings.
+- [ ] Every block rendered without failure, and none of the three §1.4 rules fired.
 - [ ] Every PNG was looked at; no cut-off labels, no overlapping edges, no unreadable fan.
 - [ ] Every label's wording exists in the summary, and the terms follow 「詞的用法」.
 - [ ] Every open question in the summary appears dashed, or in 「未畫出的」 with a reason.

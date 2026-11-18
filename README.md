@@ -128,32 +128,27 @@ skills/brainstorming/
 skills/refine/
 ├── SKILL.md                   dispatch lenses → ask one situation at a time → write refine.md
 ├── references/lenses.md       eight lenses, how to pick four, how convergence is used
-├── assets/subagent-brief.md   the brief, dispatched verbatim, with the failures it prevents
-└── scripts/check_refine.py    verdicts, [Qn] refs, consensus counts, qa numbering, raw returns
+└── assets/subagent-brief.md   the brief, dispatched verbatim, with the failures it prevents
 
 skills/visualize/
 ├── SKILL.md                   draw the summary, then fold corrections back into it
-├── references/mermaid-templates.md   eight rendered types, one sample topic, the syntax that bites
-└── scripts/render.py          render diagrams/*.mmd → png + svg; enforce the `%% source:` header
+└── references/mermaid-templates.md   eight rendered types, one sample topic, the syntax that bites
 
 skills/tidy/
 ├── SKILL.md                   read everything → verify vocabulary → write report.md
 ├── references/terminology.md  source hierarchy, the record format, terms that mean two things
-├── assets/report-template.md  the skeleton, a paragraph that holds, a rebuttal block
-└── scripts/check_report.py    negatives outside a rebuttal, advice wording, citations, spine
+└── assets/report-template.md  the skeleton, a paragraph that holds, a rebuttal block
 
 skills/report/
 ├── SKILL.md                   incident → guideline → anti-pattern → one class of fix
-├── references/gate-discipline.md   five rules for trusting a checker's green run
-├── assets/report-template.md  the skeleton, with what each section is for
-└── scripts/
-    ├── check_friction.py      citation, six fields, one class, process argument, regression
-    └── check_issue.py         publish gate: paths, contacts, revisions, deny words, redaction line
+├── references/gate-discipline.md   five rules for trusting a green run
+└── assets/report-template.md  the skeleton, with what each section is for
 ```
 
-Each script is a mechanical shadow of its skill's rules — the checks a reader would otherwise have to
-make by hand: a diagram with no source, an answer citing an exchange that does not exist, a negation
-outside a rebuttal, a fix with no regression criterion. They are meant to be run, not just shipped.
+Each of those checks is a reading the skill's Verification list demands: a diagram with no source, an answer
+citing an exchange that does not exist, a negation outside a rebuttal, a fix with no regression criterion. No
+script ships to make them — a check that scores a word list is satisfied by the word list, and the reading is
+the only form of it that can fail for the right reason.
 
 ## Adding a skill
 

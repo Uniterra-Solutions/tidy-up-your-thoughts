@@ -1,8 +1,9 @@
 # Gate discipline — five rules from five incidents
 
-Every skill in this plugin ends in checkers: `check_agents_md.py`, `study_delta.py --verify`,
-`render_graphs.py`, `check_history.py`, `find_plans.py`, plus whatever a round writes. A green run is
-only evidence while the gate could have gone red for the right reason.
+Every skill in this plugin ends in gates: a citation opened at its own line, a graph rendered, a diff read
+against the unit that owns it, an index compared with the tree. A gate is a command run in the turn or a
+reading recorded in the report — never a script the skill ships — and a green result is evidence only while
+the gate could have gone red for the right reason.
 
 These five rules were extracted from AP-001 to AP-005 in `docs/retro/`. Each names the mechanism, the
 observable symptom, and the move that prevents it. Read the four lines of a rule before quoting it; the
@@ -10,12 +11,11 @@ rule without its symptom becomes a slogan.
 
 ## Rule 1 — A gate's argument names what it resolves against
 
-**Statement.** When a checker takes a root or a base path, the invocation states which artefact that
-argument governs. Scope and resolution are different questions and are often answered by one flag.
+**Statement.** When a gate takes a root or a base path, the invocation states which artefact that argument
+governs. Scope and resolution are different questions and are often answered by one path.
 
-**Mechanism.** A checker that resolves relative citations uses its root as the base. Point it at a
-subdirectory and every citation crossing that boundary fails — the failures are real, reproducible, and
-about the caller.
+**Mechanism.** A citation resolves against the directory it is opened from. Read from a subdirectory and
+every citation crossing that boundary fails — the failures are real, reproducible, and about the reader.
 
 **Symptom.** A batch of files failing with the *same* message, while the thing being checked is visibly
 present on disk. Uniform failures mean the harness, not the artefacts.
@@ -32,7 +32,7 @@ was never written down. The fix is the ownership sentence, then both gates.
 the other protects a pointer. Neither is wrong in isolation, and no edit satisfies both while the
 boundary between them is undefined.
 
-**Symptom.** An exception clause added so one checker goes quiet, and the number of such clauses grows
+**Symptom.** An exception clause added so one gate goes quiet, and the number of such clauses grows
 with each round. Each clause is evidence that a field has two owners.
 
 **Move.** Write one sentence per gate: which field it owns, and what it must not touch. Then change the
@@ -52,14 +52,14 @@ by adjacency: three greens and one abstention read as a pass.
 to an artefact that was accepted. Or a tool failing for everyone in one environment with a message that
 reads as a missing capability.
 
-**Move.** Ship a script that carries the environment's requirement (flags, config, wrapper), and make
-"could not run" fail loudly: exit non-zero, name the missing capability, and state which artefact is
-therefore unverified.
+**Move.** Provide the invocation that carries the environment's requirement — the flag, the config, the
+pinned version — and record "could not run" as unverified rather than as passed: name the missing
+capability and state which artefact is therefore unchecked.
 
 ## Rule 4 — A derived list is a hint; the source it was derived from is the record
 
-**Statement.** Any list a script produces from a larger fact (diff, log, audit output) is a hint. The
-brief names the command that produces the larger fact, and requires the discrepancy to be reported.
+**Statement.** Any list derived from a larger fact (a diff, a log, an audit output) is a hint. The brief
+names the command that produces the larger fact, and requires the discrepancy to be reported.
 
 **Mechanism.** The list is derived from a range, and a range can be short. The consumer cannot tell a
 short list from a quiet window, so it concludes nothing happened — the cheapest possible failure, since
@@ -80,8 +80,8 @@ on every run is a production input and does not belong inside the thing being de
 **Mechanism.** "Reference" is defined by the consumer, not by the extension. A sweep scoped to the file
 type being deleted finds the readers that look like the deleted thing and misses the readers that do not.
 
-**Symptom.** After a deletion, an unrelated checker crashes on a missing file, and the error points at
-the checker rather than at the deletion.
+**Symptom.** After a deletion, an unrelated tool or gate fails on a missing file, and the error points at
+the tool rather than at the deletion.
 
 **Move.** Sweep without an extension filter, move consumed files to a stable home beside their consumer
 before the deletion, rerun the consumer and record its output, then delete.
@@ -91,8 +91,8 @@ before the deletion, rerun the consumer and record its output, then delete.
 1. Which gates ran, and which could not run in this environment?
 2. For each gate that ran: what would have made it red, and was that condition covered by a case that
    actually executed?
-3. Does any gate's verdict depend on a list that a script derived? If so, where is the source, and do the
-   two agree?
+3. Does any gate's verdict rest on a list derived from a larger fact? If so, where is the source, and do
+   the two agree?
 4. Do any two gates constrain the same field? If so, where is the ownership sentence?
 5. If something is being deleted, what reads it that does not look like a reader?
 

@@ -1,7 +1,7 @@
 ---
 name: refine
 description: "Use when an idea must meet its situations: lenses, then answers."
-version: 0.1.1
+version: 0.2.0
 author: Tsz Kin Lai (LaiTszKin), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -155,7 +155,8 @@ Then the upstream effects, in this order:
    change invalidates, and `visualize` step 2 regenerates them. A picture that still shows the old
    summary is the most persuasive wrong thing in the folder.
 3. **Update `README.md`**: the open threads the refine closed, and the ones it opened.
-4. **Run the checker**: `python3 scripts/check_refine.py ~/thoughts/<topic_name>`.
+4. **Read the report against the Verification list** in one pass, top to bottom — the verdicts, the `[Qn]`
+   references and the consensus counts are what that list is for.
 
 ## Rules of the report
 
@@ -195,5 +196,6 @@ Then the upstream effects, in this order:
 - [ ] Every row's 共識 count equals the lenses it names, and each names a real `Sxx` in that lens's return.
 - [ ] Every 已定 row carries an observable criterion and a `[Qn]` that exists in `qa.md`.
 - [ ] 未答 rows carry no answer.
-- [ ] `scripts/check_refine.py <topic>` exits 0.
+- [ ] Every verdict cell, `[Qn]` reference, consensus count and `qa.md` numbering was checked against the
+      report itself, not against an earlier draft.
 - [ ] `summary.md`, `visual.md` and `README.md` were updated if an answer moved the thought.
