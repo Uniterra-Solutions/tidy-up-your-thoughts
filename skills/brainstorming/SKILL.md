@@ -32,6 +32,8 @@ record of how it was reached**. Neither is the agent's opinion, because the agen
 
 - The question has a lookup answer (a date, an API, a price). Answer it; there is nothing to clarify.
 - The content is settled and the task is drafting, formatting or arguing it — that is writing work.
+- The user has a text in front of him and wants to know whether he understood it. That is `diagnose`,
+  which needs the source and quotes it; here the subject is his own thought, not someone else's.
 - The user wants a decision made for him. Questions expose the criteria; the criteria choose. Say
   which criteria are missing and stop.
 

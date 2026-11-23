@@ -2,7 +2,8 @@
 
 A Hermes plugin that turns a vague idea into a detailed report and a picture of it, through a fixed
 sequence of steps rather than a good conversation. Five bundled skills, one per stage: ask, stress,
-draw, write, and — when the sequence itself misfires — fix the sequence.
+draw, write, and — when the sequence itself misfires — fix the sequence. A sixth, `diagnose`, is a
+second entry point for the other kind of reading: a text in hand, and no way to tell whether it went in.
 
 ## Install
 
@@ -45,6 +46,7 @@ work with a different failure. One conversation does all of them badly.
 | Draw | `visualize` | the summary rendered as mermaid: composition, forks, argument chains, trade-offs, the shape of the thinking | a picture that asserts what the prose never did |
 | Write | `tidy` | one report for a reader who was not there | a transcript with headings |
 | Fix the process | `report` | an incident turned into one anti-pattern and one class of change | an apology |
+| Diagnose a text | `diagnose` | three to seven concepts extracted from a supplied text, each tested one question at a time until its status is known | a quiz that grades recall, or a verdict quoting the model's memory instead of the text |
 
 ```mermaid
 flowchart TB
@@ -53,9 +55,12 @@ flowchart TB
   v --> r["refine<br/>situations → answers → refine.md"]
   r --> t["tidy<br/>every earlier file → report.md"]
   r -.->|"an answer moved the idea"| q
+  text(["a text"]) --> d["diagnose<br/>concepts → verdicts → map.md"]
 ```
 
 `report` is not a stage in that chain: it repairs any stage that misfired, and it is described below.
+`diagnose` is the other direction of travel — it shares the folder and the `[Qn]` discipline with the
+chain, but takes the reader rather than the idea as its subject.
 
 Three invariants hold across every stage, and they are what make the output trustworthy:
 
@@ -65,6 +70,12 @@ Three invariants hold across every stage, and they are what make the output trus
    The record never grows a position nobody took.
 3. **Every substantive sentence traces to an entry.** `[Qn]` for an exchange, `[Sxx]` for a situation.
    A claim that cannot be traced is either a transition or it does not belong in the document.
+
+`diagnose` adds a fourth, because it is the only skill in the plugin that judges an answer:
+
+4. **A verdict is a quotation.** The agent does hold a position there — that an answer does or does not
+   match the material — and it is admissible only as a quote from `source.md`, with the section named.
+   A verdict that cannot point at its line is the model's memory of the field wearing a grade.
 
 The record accumulates in `~/thoughts/<topic_name>/`, one file per stage, append-only. Corrections
 amend the upstream file rather than patching the artefact downstream — a diagram that disagrees with
@@ -79,6 +90,7 @@ the summary is corrected in the summary, then regenerated.
 | `tidy-up-your-thoughts:visualize` | Reads the summary and draws it: a mind map for composition, a decision flow for forks, an argument chain that puts the negation last, a quadrant for a trade-off, a timeline for how the thinking moved — two to four diagrams, every node traceable to a summary line, open questions dashed. Renders PNG + SVG, checks provenance mechanically, and folds corrections back into `summary.md` and `REVISIONS.md` rather than patching the picture |
 | `tidy-up-your-thoughts:tidy` | Turns the whole topic folder into `report.md` for a reader who was not there: every statement traced to `[Qn]` / `[Sxx]`, ordered by support rather than chronology, domain terms verified against the instrument that defines them. Topic sentence per paragraph, declarative sentences, negation admitted only inside a rebuttal that first builds the counter-argument in full |
 | `tidy-up-your-thoughts:report` | Meta skill for when the workflow itself misfired: finds the guideline that produced the wrong action (quoted with file and line, or names the missing one), extracts one abstract anti-pattern with six fields, then applies exactly one class of fix — prompt, information, code or process — in the same session, and appends it to an anti-pattern index with a regression criterion. The same skill ships in `pdd` as `pdd:report` |
+| `tidy-up-your-thoughts:diagnose` | Takes a supplied text, sections it in `source.md`, and extracts three to seven load-bearing concepts by deletion — if a key sentence still stands without the term, the term was decoration. Shows the list so the user can cut it, then asks one probe at a time (open → boundary → counterexample → transfer), judges each answer against the quoted line rather than the model's memory of the field, and refuses to grade a concept whose prerequisite is not yet `clear`. Writes `concepts.md` and `map.md`: what is clear, on the evidence of which exchange, and what is not |
 
 ### Why `report` exists
 
@@ -100,6 +112,22 @@ incident becomes a report in `~/thoughts/<topic>/friction/` (or `docs/retro/` un
 in the index, and an applied fix in the same session. Self-repair that leaves a paper trail is
 reviewable; self-repair that leaves none is indistinguishable from drift.
 
+### Why `diagnose` is outside the chain
+
+Every other skill here works on what the user already holds: his idea, his summary, his answers. None
+of them may supply a position, and that is easy to keep while the subject is his own thought.
+
+A text changes the subject. Now the question is whether *the text's* distinctions arrived, and the only
+honest way to answer it is to compare his answer to the text. That is a judgement, so the skill carries
+the one thing the rest of the plugin never needs: a rule that a judgement must be a quotation, with the
+section named, checked against `source.md` before it is written. The gate is not a formality. Without
+it, a fluent model grades from its memory of the field, and the user receives a mark he cannot check and
+the agent cannot defend.
+
+The skill also stops where a study guide would keep going: it does not summarise, does not explain the
+concept back, and does not produce notes. A summary feels like progress and tests nothing; a probe that
+cannot be answered from memory is the only thing that moves a status.
+
 ## The topic folder
 
 ```
@@ -107,6 +135,9 @@ reviewable; self-repair that leaves none is indistinguishable from drift.
 ├── README.md        the topic in one line, opened date, open threads
 ├── qa.md            append-only transcript, Q1..Qn, no gaps
 ├── summary.md       what the topic establishes, each line with [Qn] provenance
+├── source.md        the diagnosed text, sectioned §1..§n — the only admissible source of a verdict
+├── concepts.md      three to seven quoted cards, plus the secondary list and what was cut, with the check each failed
+├── map.md           what each concept reached, and the [Qn] that established it
 ├── diagrams/        *.mmd sources, rendered *.png / *.svg, visual.md captions, REVISIONS.md
 ├── refine.md        the situations the idea met, what was settled, what was left blank
 ├── refine-raw/      one verbatim return per lens — the merge is auditable only while these survive
@@ -143,6 +174,11 @@ skills/report/
 ├── SKILL.md                   incident → guideline → anti-pattern → one class of fix
 ├── references/gate-discipline.md   five rules for trusting a green run
 └── assets/report-template.md  the skeleton, with what each section is for
+
+skills/diagnose/
+├── SKILL.md                   source gate → extract → cut → one probe at a time → map.md
+├── references/probe-types.md  four probe types, what each can prove, the rewrites that work
+└── assets/record-templates.md source.md, concepts.md, the qa.md fields, map.md, README.md
 ```
 
 Each of those checks is a reading the skill's Verification list demands: a diagram with no source, an answer
