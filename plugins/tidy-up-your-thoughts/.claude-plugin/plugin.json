@@ -1,0 +1,20 @@
+{
+  "name": "tidy-up-your-thoughts",
+  "displayName": "Tidy Up Your Thoughts",
+  "version": "0.9.0",
+  "description": "Tidy Up Your Thoughts — six skills that take an unstructured pile to a written conclusion: Socratic questioning, lens-based stress-testing, mermaid visualisation, report writing, text diagnosis, and retrospection on the process itself.",
+  "author": {
+    "name": "Uniterra Solutions Ltd.",
+    "url": "https://github.com/Uniterra-Solutions"
+  },
+  "homepage": "https://github.com/Uniterra-Solutions/tidy-up-your-thoughts",
+  "repository": "https://github.com/Uniterra-Solutions/tidy-up-your-thoughts",
+  "license": "MIT",
+  "keywords": [
+    "thinking",
+    "socratic",
+    "report",
+    "mermaid",
+    "diagnosis"
+  ]
+}

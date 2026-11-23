@@ -1,0 +1,25 @@
+{
+  "name": "tidy-up-your-thoughts",
+  "owner": {
+    "name": "Uniterra Solutions Ltd.",
+    "url": "https://github.com/Uniterra-Solutions"
+  },
+  "metadata": {
+    "description": "Tidy Up Your Thoughts skills for Claude Code, Codex, Muse and Grok Build"
+  },
+  "plugins": [
+    {
+      "name": "tidy-up-your-thoughts",
+      "source": "./plugins/tidy-up-your-thoughts",
+      "description": "Tidy Up Your Thoughts — six skills that take an unstructured pile to a written conclusion: Socratic questioning, lens-based stress-testing, mermaid visualisation, report writing, text diagnosis, and retrospection on the process itself.",
+      "version": "0.9.0",
+      "category": "productivity",
+      "tags": [
+        "thinking",
+        "socratic",
+        "report",
+        "mermaid"
+      ]
+    }
+  ]
+}

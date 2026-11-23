@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "name": "tidy-up-your-thoughts",
+  "displayName": "Tidy Up Your Thoughts",
+  "version": "0.9.0",
+  "description": "Tidy Up Your Thoughts — six skills that take an unstructured pile to a written conclusion: Socratic questioning, lens-based stress-testing, mermaid visualisation, report writing, text diagnosis, and retrospection on the process itself.",
+  "compat": {
+    "source": "native",
+    "manifestDir": ".muse-plugin"
+  },
+  "capabilities": {
+    "skills": [
+      {
+        "id": "brainstorming",
+        "path": "skills/brainstorming/SKILL.md"
+      },
+      {
+        "id": "diagnose",
+        "path": "skills/diagnose/SKILL.md"
+      },
+      {
+        "id": "refine",
+        "path": "skills/refine/SKILL.md"
+      },
+      {
+        "id": "report",
+        "path": "skills/report/SKILL.md"
+      },
+      {
+        "id": "tidy",
+        "path": "skills/tidy/SKILL.md"
+      },
+      {
+        "id": "visualize",
+        "path": "skills/visualize/SKILL.md"
+      }
+    ],
+    "commands": [],
+    "hooks": [],
+    "mcpServers": [],
+    "reminders": []
+  }
+}

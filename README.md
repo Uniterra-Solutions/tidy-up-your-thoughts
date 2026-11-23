@@ -1,38 +1,137 @@
 # tidy-up-your-thoughts
 
-A Hermes plugin that turns a vague idea into a detailed report and a picture of it, through a fixed
-sequence of steps rather than a good conversation. Five bundled skills, one per stage: ask, stress,
-draw, write, and — when the sequence itself misfires — fix the sequence. A sixth, `diagnose`, is a
-second entry point for the other kind of reading: a text in hand, and no way to tell whether it went in.
+Turns a vague idea into a detailed report and a picture of it, through a fixed sequence of steps rather
+than a good conversation. Five skills, one per stage: ask, stress, draw, write, and — when the sequence
+itself misfires — fix the sequence. A sixth, `diagnose`, is a second entry point for the other kind of
+reading: a text in hand, and no way to tell whether it went in.
+
+One `skills/` tree at the repo root is the only copy of the content. Four manifests point at it, so the
+same six skills install into Hermes Agent, Muse, Claude Code and Codex — and into Grok Build, xAI's CLI —
+with every host namespacing them as `tidy-up-your-thoughts:<skill>`.
 
 ## Install
+
+### 1. Hermes Agent
 
 ```bash
 hermes plugins install Uniterra-Solutions/tidy-up-your-thoughts --enable
 ```
 
-Skills register under the plugin namespace, so they are called by qualified name:
+`plugin.yaml` and `__init__.py` are the Hermes manifest: `register(ctx)` reads each `skills/<name>/SKILL.md`,
+forwards its `description` and calls `ctx.register_skill()`, so the skills load from the plugin registry rather
+than from `~/.hermes/skills/`, stay read-only to `skill_manage` and the curator, and appear in the skill index
+under their qualified names while the plugin is enabled. A running gateway keeps the registration it started
+with — `hermes plugins disable <name>` then `enable` forces the reload.
 
-```bash
+```text
 skill_view("tidy-up-your-thoughts:brainstorming")
+skill_view("tidy-up-your-thoughts:tidy", "references/terminology.md")
 ```
 
-Disabling removes them from the index and deletes nothing:
-
-```bash
-hermes plugins disable tidy-up-your-thoughts
-```
-
-**Developing from a checkout.** `hermes plugins install` takes a catalog name, a git URL or
-`owner/repo` — never a bare local path. Link the working copy in instead:
+`hermes plugins install` takes a catalog name, a git URL or `owner/repo` — never a bare local path. To work
+from a checkout, link it in instead:
 
 ```bash
 ln -sfn ~/tidy-up-your-thoughts "$HERMES_HOME/plugins/tidy-up-your-thoughts"
 hermes plugins enable tidy-up-your-thoughts
 ```
 
-Adding a skill to an already-enabled plugin does not reach a running gateway on its own:
-`hermes plugins disable <name>` then `enable` forces the reload.
+### 2. Muse
+
+```bash
+muse plugins marketplace add tidy-up-your-thoughts Uniterra-Solutions/tidy-up-your-thoughts
+muse plugins install tidy-up-your-thoughts@tidy-up-your-thoughts
+muse plugins approve tidy-up-your-thoughts
+```
+
+From a local checkout, without the marketplace step:
+
+```bash
+muse plugins install "$(pwd)/plugins/tidy-up-your-thoughts" --scope user
+muse plugins approve tidy-up-your-thoughts
+muse skills list          # expect the six skills
+```
+
+`plugins/tidy-up-your-thoughts/.muse-plugin/plugin.json` declares `schemaVersion: 1` and lists every skill by
+`{"id", "path"}` under `capabilities` — Muse does not discover a directory on its own, so the list is the
+contract. Plugins and marketplaces are on by default in current Muse builds; on an older build where
+`muse plugins --help` refuses the command, set `MUSE_EXPERIMENTAL_PLUGINS=1`.
+
+Muse also reads skills that no plugin installed, in this order: `~/.agents/skills`, then `~/.claude/skills`,
+then `~/.codex/skills`. A machine that already installed this package for Claude Code or Codex therefore
+reaches Muse with no extra step; `muse skills import --from claude` copies them explicitly instead.
+
+### 3. Claude Code
+
+```text
+/plugin marketplace add Uniterra-Solutions/tidy-up-your-thoughts
+/plugin install tidy-up-your-thoughts@tidy-up-your-thoughts
+```
+
+The same two steps from a shell, or against a local checkout instead of GitHub:
+
+```bash
+claude plugin marketplace add Uniterra-Solutions/tidy-up-your-thoughts   # or: add ./tidy-up-your-thoughts
+claude plugin install tidy-up-your-thoughts@tidy-up-your-thoughts
+claude plugin details tidy-up-your-thoughts   # expect: Skills (6) brainstorming, diagnose, … visualize
+```
+
+The marketplace index is `.claude-plugin/marketplace.json`; the package it lists is
+`plugins/tidy-up-your-thoughts`, whose `.claude-plugin/plugin.json` carries the display name and version.
+`claude plugin validate plugins/tidy-up-your-thoughts` checks both and passes; its one warning is a missing
+icon, which no install needs. Install scopes are user, project (committed `.claude/settings.json`) and local; a
+cloud session at claude.ai/code does not read local plugin settings.
+
+### 4. Codex
+
+```bash
+codex plugin marketplace add Uniterra-Solutions/tidy-up-your-thoughts
+codex plugin add tidy-up-your-thoughts@tidy-up-your-thoughts
+```
+
+`plugins/tidy-up-your-thoughts/plugin.json` is an [Agent Plugins 1.0](https://agent-plugins.org) package — the
+portable `skills` + `mcp` format Codex reads natively — and `.codex-plugin/plugin.json` is the compatibility
+overlay. Proof that the skills reached the model rather than merely installing:
+
+```bash
+codex debug prompt-input | grep -o 'tidy-up-your-thoughts:[a-z]*' | sort -u
+# tidy-up-your-thoughts:brainstorming … tidy-up-your-thoughts:visualize
+```
+
+Two constraints worth knowing before editing the index: Codex silently skips a package whose `source.path` is
+the marketplace root (it reports `No marketplace plugins found` and no error), and it fails an install with
+`missing plugin.json` if the package holds a `.claude-plugin/` directory without a manifest inside it.
+
+### 5. Grok Build
+
+```bash
+grok plugin marketplace add Uniterra-Solutions/tidy-up-your-thoughts
+grok plugin install tidy-up-your-thoughts --trust
+grok plugin validate plugins/tidy-up-your-thoughts   # optional: check the package before installing
+```
+
+Grok Build is xAI's CLI, and it reads the same package: components are discovered from `skills/`, and the
+marketplace index it browses is `.grok-plugin/marketplace.json`. It is also Claude-compatible, so the
+`.claude-plugin/` manifests apply without modification. Plugins load disabled until they are trusted, and
+`--trust` grants that at install time; without it the install stops after showing what the plugin would add.
+
+### What each host reads
+
+| Host | Manifest | Marketplace index | Namespacing |
+| --- | --- | --- | --- |
+| Hermes Agent | `plugin.yaml` + `__init__.py` | — (plugin registry) | `tidy-up-your-thoughts:<skill>` |
+| Muse | `plugins/tidy-up-your-thoughts/.muse-plugin/plugin.json` | `.claude-plugin/marketplace.json` | `<skill id>` |
+| Claude Code | `plugins/tidy-up-your-thoughts/.claude-plugin/plugin.json` | `.claude-plugin/marketplace.json` | `tidy-up-your-thoughts:<skill>` |
+| Codex | `plugins/tidy-up-your-thoughts/plugin.json` (Agent Plugins 1.0) | `.claude-plugin/marketplace.json` | `tidy-up-your-thoughts:<skill>` |
+| Grok Build | `plugins/tidy-up-your-thoughts/plugin.json`, or the `.claude-plugin/` equivalents | `.grok-plugin/marketplace.json` | `tidy-up-your-thoughts:<skill>` |
+
+Editing a `SKILL.md` means editing it once, under `skills/`, and running the sync script — the mirror under
+`plugins/tidy-up-your-thoughts/skills/` is generated, and `--check` fails when it drifts:
+
+```bash
+python3 scripts/build-agent-plugin.py           # mirror skills/ into the package and stamp versions
+python3 scripts/build-agent-plugin.py --check   # exit 1 when the mirror or a manifest version is stale
+```
 
 ## Design
 
@@ -148,7 +247,7 @@ cannot be answered from memory is the only thing that moves a status.
 ## Repository layout
 
 ```
-plugin.yaml                    manifest: name, version, description, licence
+plugin.yaml                    Hermes manifest: name, version, description, licence
 __init__.py                    register(ctx) — one register_skill() per skills/<dir>/SKILL.md
 skills/brainstorming/
 ├── SKILL.md                   the workflow and the three laws
@@ -179,6 +278,20 @@ skills/diagnose/
 ├── SKILL.md                   source gate → extract → cut → one probe at a time → map.md
 ├── references/probe-types.md  four probe types, what each can prove, the rewrites that work
 └── assets/record-templates.md source.md, concepts.md, the qa.md fields, map.md, README.md
+
+.claude-plugin/
+  marketplace.json             marketplace index read by Claude Code, Codex and Muse
+.grok-plugin/
+  marketplace.json             marketplace index for Grok Build (it reads .claude-plugin/ too)
+plugins/tidy-up-your-thoughts/ the portable package the other hosts install
+  plugin.json                  Agent Plugins 1.0 manifest (Codex, and any compliant client)
+  .claude-plugin/plugin.json   Claude Code (and Grok Build) manifest
+  .codex-plugin/plugin.json    Codex compatibility overlay
+  .muse-plugin/plugin.json     Muse manifest, skills listed by id and path
+  skills/                      generated mirror of skills/ — never edit by hand
+  README.md                    package description shown by marketplaces
+scripts/
+  build-agent-plugin.py        mirror skills/ into the package, stamp versions, --check mode
 ```
 
 Each of those checks is a reading the skill's Verification list demands: a diagram with no source, an answer
@@ -204,44 +317,30 @@ the only form of it that can fail for the right reason.
    ---
    ```
 
-   `description` is the only line the model matches on in `<available_skills>`; `__init__.py` reads it
-   out of the frontmatter and forwards it to `ctx.register_skill`, so a wrong description means a skill
-   nobody loads.
+   `description` is the only line a host matches on in its skill index: `__init__.py` reads it out of the
+   frontmatter and forwards it to `ctx.register_skill` for Hermes, and every other host reads the same line
+   from `SKILL.md` directly. A wrong description means a skill nobody loads.
 2. Supporting material goes beside it, never in a flat pile: `references/<topic>.md`,
    `assets/<template>`, `scripts/<tool>`.
-3. Bump `version` in `plugin.yaml`, commit, and reload (`disable` then `enable`).
+3. Bump `version` in `plugin.yaml`, run `python3 scripts/build-agent-plugin.py` so the mirror and all four
+   manifests carry it, commit, and reload the host you are testing on.
 
-## What "bundled" buys you
+## Verifying an install
 
-- The skills live in the plugin registry, **not** in `~/.hermes/skills/`. They are read-only:
-  `skill_manage`, the curator and background review passes cannot edit them.
-- They still appear in `skills_list` and in the system prompt's `<available_skills>` index while the
-  plugin is enabled, under their qualified names.
-- The qualified name is what resolves unambiguously; a bare `skill_view("name")` can still hit an
-  on-disk skill of the same name.
-
-## Verifying a change
+Every host has a cheaper check than running a skill and hoping:
 
 ```bash
-# 1. manifest, register() run in isolation, security scan — the cheap gate
-hermes plugins validate .
-
-# 2. what the live plugin manager actually registered (use the interpreter that carries Hermes's own
-#    dependency closure; a plain python3 dies on ruamel)
-VP=$(ls -d ~/.hermes/installs/*/environments/*/venv/bin/python3 | head -1)
-env -u PYTHONPATH "$VP" - <<'PY'
-import sys; from pathlib import Path
-sys.path.insert(0, str(Path.home()/".hermes/hermes-agent"))
-from hermes_cli.plugins import get_plugin_manager
-pm = get_plugin_manager(); pm.discover_and_load()
-print(sorted(pm._plugins))
-for name, meta in sorted(pm._plugin_skills.items()):
-    print(name, "|", meta.get("description", "")[:70])
-PY
+python3 scripts/build-agent-plugin.py --check   # the package still mirrors skills/
+hermes plugins validate .                       # Hermes: manifest, register() in isolation, security scan
+claude plugin validate plugins/tidy-up-your-thoughts
+claude plugin details tidy-up-your-thoughts     # component inventory: expect all six, plus token cost
+codex debug prompt-input | grep -c 'tidy-up-your-thoughts:'
 ```
 
-Then, in a **new** session, confirm `skills_list` shows the qualified names — registration is
-per-process, so the session that already ran keeps its snapshot.
+`claude plugin details` and `codex debug prompt-input` are the two that prove the skills reached the model
+rather than merely installing: the first lists what the host loaded, the second shows the entries injected into
+the prompt. Registration is per-process on every host, so a session that was already running keeps the snapshot
+it started with — restart it, or reload the plugin, before believing a change landed.
 
 ## Licence
 
